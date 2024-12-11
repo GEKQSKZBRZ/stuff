@@ -1,4 +1,4 @@
-local reqFunctions = {}
+local util = {}
 
 local ts = game:GetService("TweenService")
 local runs = game:GetService("RunService")
@@ -6,7 +6,7 @@ local plrs = game:GetService("Players")
 local plrGUI = plrs.LocalPlayer.PlayerGui
 local custAsset = getsynasset or getcustomasset
 
-function reqFunctions.createTween(a)
+function util:createTween(a)
 	local p,t,es,ed,g = a.Part, a.Time, a.EasingStyle, a.EasingDirection, a.Goal
 	local tw
 
@@ -22,7 +22,7 @@ function reqFunctions.createTween(a)
 	return tw
 end
 
-function reqFunctions.randSpawn()
+function util:randSpawn()
 	local spawns = {}
 	for _, v in pairs(workspace:GetDescendants()) do
 		if v:IsA("SpawnLocation") then
@@ -34,7 +34,7 @@ function reqFunctions.randSpawn()
 	end
 end
 
-function reqFunctions.createAnim(id, name, par)
+function util:createAnim(id, name, par)
 	local animins = Instance.new("Animation")
 	animins.AnimationId = "rbxassetid://"..id
 	animins.Name = name
@@ -42,7 +42,7 @@ function reqFunctions.createAnim(id, name, par)
 	return animins
 end
 
-function reqFunctions.makeFol(ta)
+function util:makeFol(ta)
 	local t
 	for i = 1, #ta do
 		t = ta[i]
@@ -58,7 +58,7 @@ function reqFunctions.makeFol(ta)
 	return t .. "/"
 end 
 
-function reqFunctions.downloadAsset(name, link)
+function util:downloadAsset(name, link)
 	if isfile(name) then
 		pcall(delfile, name)
 		repeat task.wait() until not isfile(name)
@@ -69,7 +69,7 @@ function reqFunctions.downloadAsset(name, link)
 	return custAsset(name)
 end
 
-function reqFunctions.CreateCharacter(iconText, iconImg, magicText, onSpawn)
+function util:CreateCharacter(iconText, iconImg, magicText, onSpawn)
 	chrs = {
 		["SERIOUS MODE"] = "Saitama",
 		["RAMPAGE"] = "Garou",
@@ -118,4 +118,4 @@ function reqFunctions.CreateCharacter(iconText, iconImg, magicText, onSpawn)
 	end)
 end
 
-return reqFunctions
+return util
