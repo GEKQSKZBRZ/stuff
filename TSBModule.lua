@@ -42,80 +42,16 @@ function util:createAnim(id, name, par)
 	return animins
 end
 
-function util:makeFol(ta)
-	local t
-	for i = 1, #ta do
-		t = ta[i]
-		if i > 1 then 
-			t = ta[1]..'/'..ta[i] 
-		end
-		if not isfile(t) then
-			pcall(makefolder, t)
-		else
-			pcall(delfile, t)
-		end
-	end
-	return t .. "/"
-end 
-
 function util:downloadAsset(name, link)
 	if isfile(name) then
 		pcall(delfile, name)
 		repeat task.wait() until not isfile(name)
 	end
-
+	
 	pcall(writefile, name, request({Url = link, Method = 'GET'}).Body)
 	repeat task.wait() until isfile(name)
 	return custAsset(name)
 end
 
-function util:CreateCharacter(iconText, iconImg, magicText, onSpawn)
-	chrs = {
-		["SERIOUS MODE"] = "Saitama",
-		["RAMPAGE"] = "Garou",
-		["MAXIMUM ENERGY OUTPUT"] = "Genos",
-		["CAN YOU EVEN SEE ME?"] = "Sonic",
-		["PUMPED UP"] = "Bad",
-		["SCORCHING BLADE"] = "Kamikaze",
-		["BERSERK"] = "Tatsumaki"
-	}
-	for _,v in ipairs(plrGUI:GetDescendants()) do
-		if v.Name == "CrabBoss" then
-			cusIcon = v:Clone()
-			cusIcon.Name = "CustomIcon"
-			cusIcon.Parent = v.Parent
-			cusIcon:WaitForChild("IconButton"):WaitForChild("IconLabel").Text = iconText
-			cusIcon:WaitForChild("IconButton"):WaitForChild("IconImage").Image = iconImg
-		end
-	end
-
-	local mous 
-	mous = cusIcon.MouseEnter:Connect(function()
-		cusIcon.IconOverlay.BackgroundTransparency = .9
-	end)
-
-	local mousl
-	mousl = cusIcon.MouseLeave:Connect(function()
-		cusIcon.IconOverlay.BackgroundTransparency = 1
-	end)
-
-	local mClick
-	mClick = cusIcon.IconButton.MouseButton1Down:Connect(function(inp)
-		if plrGUI.ScreenGui.MagicHealth.TextLabel.Text == magicText then
-			cusIcon.IconOverlay.BackgroundColor3 = Color3.fromRGB(0,0,0)
-			cusIcon.IconOverlay.BackgroundTransparency = .7
-			onSpawn()
-		else 
-			cusIcon.IconButton.IconLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
-		end 
-	end)
-
-	local mClickOver
-	mClickOver = cusIcon.IconButton.MouseButton1Up:Connect(function(inp)
-		cusIcon.IconOverlay.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-		cusIcon.IconOverlay.BackgroundTransparency = 1
-		cusIcon.IconButton.IconLabel.TextColor3 = Color3.fromRGB(255, 216, 19)
-	end)
-end
 
 return util
