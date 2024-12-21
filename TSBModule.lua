@@ -80,7 +80,7 @@ function util:CreateCharacter(iconText, iconImg, magicText, onSpawn)
 		["BERSERK"] = "Tatsumaki"
 	}
 	for _,v in ipairs(plrGUI:GetDescendants()) do
-		if v.Name == "Sorcerer" then
+		if v.Name == "Crab" then
 			cusIcon = v:Clone()
 			cusIcon.Name = "CustomIcon"
 			cusIcon.Parent = v.Parent
