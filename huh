@@ -13,7 +13,7 @@ local mathrand = math.random;
 local l_Remotes_0 = game.ReplicatedStorage:WaitForChild("Remotes");
 local v11 = {};
 local l_CurrentCamera_0 = workspace.CurrentCamera;
-local v13 = require(l_ReplicatedStorage_0.ClientModules.CameraShaker);
+--local v13 = require(l_ReplicatedStorage_0.ClientModules.CameraShaker);
 local function v15(v14)
     l_CurrentCamera_0.CFrame = l_CurrentCamera_0.CFrame * v14;
 end;
