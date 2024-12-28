@@ -1,0 +1,713 @@
+-- Saved by UniversalSynSaveInstance https://discord.gg/wx4ThpAsmw
+
+local l_Workspace_0 = game:GetService("Workspace");
+local l_Players_0 = game:GetService("Players");
+local l_Lighting_0 = game:GetService("Lighting");
+local l_ReplicatedFirst_0 = game:GetService("ReplicatedFirst");
+local l_ReplicatedStorage_0 = game:GetService("ReplicatedStorage");
+local l_UserInputService_0 = game:GetService("UserInputService");
+local l_RunService_0 = game:GetService("RunService");
+local mathrad = math.rad;
+local mathsin = math.sin;
+local mathrand = math.random;
+local l_Remotes_0 = game.ReplicatedStorage:WaitForChild("Remotes");
+local v11 = {};
+local l_CurrentCamera_0 = workspace.CurrentCamera;
+local v13 = require(l_ReplicatedStorage_0.ClientModules.CameraShaker);
+local function v15(v14)
+    l_CurrentCamera_0.CFrame = l_CurrentCamera_0.CFrame * v14;
+end;
+local function getTime()
+    return l_Workspace_0:GetServerTimeNow();
+end;
+local v17 = v13.new(Enum.RenderPriority.Camera.Value + 1, v15);
+v17:Start();
+local v18 = {};
+local l_LocalPlayer_0 = l_Players_0.LocalPlayer;
+v18.Weld = function(v20, v21, v22, v23)
+    local l_Weld_0 = Instance.new("Weld");
+    l_Weld_0.Name = v23 or "Weld";
+    l_Weld_0.Part0 = v20;
+    l_Weld_0.Part1 = v21;
+    if v22 then
+        l_Weld_0.C0 = v22;
+    end;
+    l_Weld_0.Parent = v21;
+    return l_Weld_0;
+end;
+v18.CheckCooldown = function(v25, v26)
+    if (v25:GetAttribute(v26) and v25:GetAttribute(v26 .. "Debounce")) and l_Workspace_0:GetServerTimeNow() - v25:GetAttribute(v26 .. "Debounce") > v25:GetAttribute(v26) then
+        print(v25:GetAttribute(v26));
+        return true;
+    elseif not v25:GetAttribute(v26) then
+        return true;
+    else
+        return ;
+    end;
+end;
+v18.CreateSound = function(v27, v28)
+    local v29 = v27:Clone();
+    v29.Parent = v28;
+    pcall(function()
+        task.spawn(function()
+            if v29.PlayOnRemove then
+                v29:Destroy();
+                return ;
+            else
+                v29:Play();
+                v29.Ended:Wait();
+                v29:Destroy();
+                return ;
+            end;
+        end);
+    end);
+    return v29;
+end;
+v18.shakeScreen = function(v30)
+    v17:Shake(v13.Presets[v30]);
+end;
+v18.Create = function(v31, v32, v33)
+    local v34 = Instance.new(v31);
+    v34.Name = v32;
+    v34.Parent = v33;
+    return v34;
+end;
+v18.checkIfHit = function()
+    local v35 = l_LocalPlayer_0.Character or l_LocalPlayer_0.CharacterAdded:Wait();
+    if v35:FindFirstChild("Hit") or v35:FindFirstChild("Debounce") then
+        return true;
+    else
+        return false;
+    end;
+end;
+v18.positionDistanceLimit = function(v36, v37)
+    local l_HumanoidRootPart_0 = l_LocalPlayer_0.Character.HumanoidRootPart;
+    if (v36 - l_HumanoidRootPart_0.Position).magnitude > v37 then
+        return (CFrame.new(l_HumanoidRootPart_0.Position, v36) * CFrame.new(0, 0, -v37)).Position;
+    else
+        return v36;
+    end;
+end;
+v18.GetParticles = function(v39)
+    local v40 = {};
+    for _, v42 in pairs(v39:GetDescendants()) do
+        if v42:IsA("ParticleEmitter") then
+            v40[v42] = {
+                Particle = v42, 
+                Transparency = {}, 
+                Size = {}
+            };
+            for v43 = 1, #v40[v42].Particle.Transparency.Keypoints do
+                v40[v42].Transparency[v43] = {
+                    Value = v40[v42].Particle.Transparency.Keypoints[v43].Value, 
+                    Time = v40[v42].Particle.Transparency.Keypoints[v43].Time
+                };
+            end;
+            for v44 = 1, #v40[v42].Particle.Size.Keypoints do
+                v40[v42].Size[v44] = {
+                    Value = v40[v42].Particle.Size.Keypoints[v44].Value, 
+                    Time = v40[v42].Particle.Size.Keypoints[v44].Time
+                };
+            end;
+            v42.Size = NumberSequence.new(0);
+            v42.Transparency = NumberSequence.new(1);
+        end;
+    end;
+    return v40;
+end;
+v18.GetParts = function(v45)
+    local v46 = {};
+    local l_v45_Descendants_0 = v45:GetDescendants();
+    table.insert(l_v45_Descendants_0, v45);
+    for _, v49 in pairs(l_v45_Descendants_0) do
+        if v49:IsA("BasePart") then
+            v46[v49] = {
+                Part = v49, 
+                Transparency = v49.Transparency, 
+                Size = v49.Size
+            };
+            v49.Size = Vector3.new(0, 0, 0, 0);
+            v49.Transparency = 1;
+        end;
+    end;
+    return v46;
+end;
+v18.getMousePos = function(v50)
+    local l_HumanoidRootPart_0 = l_LocalPlayer_0.Character.HumanoidRootPart;
+    local l_LockOn_0 = l_LocalPlayer_0.Backpack.Main.LockOnScript.LockOn;
+    if l_LockOn_0.Value then
+        return l_LockOn_0.Value.HumanoidRootPart.CFrame.p;
+    else
+        return v50.Hit.p;
+    end;
+end;
+v18.getGroundFromPosition = function(v53)
+    local v54 = {};
+    for _, v56 in pairs(workspace.Live:GetChildren()) do
+        if v56:FindFirstChild("Humanoid") then
+            table.insert(v54, v56);
+        end;
+    end;
+    local _, v58 = workspace:FindPartOnRayWithIgnoreList(Ray.new(v53 + Vector3.new(0, 1, 0, 0), (Vector3.new(0, -10000000, 0, 0))), v54);
+    return v58;
+end;
+v18.checkRay = function(v59, v60, v61)
+    local v62 = {};
+    for _, v64 in pairs(workspace.Live:GetChildren()) do
+        if v64:FindFirstChild("Humanoid") then
+            table.insert(v62, v64);
+        end;
+    end;
+    local l_workspace_PartOnRayWithIgnoreList_1, l_Val_0 = workspace:FindPartOnRayWithIgnoreList(Ray.new(v59 - v60.unit, v60.unit * (v61 + 1)), v62);
+    return l_workspace_PartOnRayWithIgnoreList_1;
+end;
+v18.changeSizeAndTransparency = function(v67, v68, v69, v70)
+    task.spawn(function()
+        local v71 = 1;
+        local v72 = 1;
+        local v73 = "Size";
+        local l_v69_0 = v69;
+        if v70 then
+            v71 = v69;
+            v69 = 1;
+            v72 = -1;
+        end;
+        for v75 = v71, v69, v72 do
+            for _ = 1, 2 do
+                if v73 == "Size" then
+                    v73 = "Transparency";
+                else
+                    v73 = "Size";
+                end;
+                local v77 = {};
+                for v78 = 1, #v67[v68][v73] do
+                    if v73 == "Transparency" then
+                        table.insert(v77, NumberSequenceKeypoint.new(v67[v68][v73][v78].Time, 1 - ((1 - v67[v68][v73][v78].Value) / l_v69_0) * v75));
+                    else
+                        table.insert(v77, NumberSequenceKeypoint.new(v67[v68][v73][v78].Time, v67[v68][v73][v78].Value * (v75 / l_v69_0)));
+                    end;
+                end;
+                v68[v73] = NumberSequence.new(v77);
+            end;
+            wait(0.03);
+        end;
+    end);
+end;
+v18.getSpot = function(v79, v80, v81)
+    local l_v80_0 = v80;
+    local l_v80_1 = v80;
+    for v84 = 1, 360 do
+        v80 = l_v80_1 * CFrame.Angles(0, math.rad(v84), 0);
+        local l_workspace_PartOnRay_0, l_Val_0 = workspace:FindPartOnRay(Ray.new(v80.p - v80.rightVector, v80.lookVector.unit * v81), v79, false, true);
+        local l_workspace_PartOnRay_1, l_Val_1 = workspace:FindPartOnRay(Ray.new(v80.p + v80.rightVector, v80.lookVector.unit * v81), v79, false, true);
+        if not l_workspace_PartOnRay_0 and not l_workspace_PartOnRay_1 then
+            return v80;
+        end;
+    end;
+    return l_v80_0;
+end;
+v18.getLockedOnPlayer = function(v89)
+    if v89:FindFirstChild("LockOnScript") and v89:FindFirstChild("LockOnScript").LockOn.Value then
+        return v89:FindFirstChild("LockOnScript").LockOn.Value;
+    else
+        return false;
+    end;
+end;
+v18.qwait = function()
+    task.wait();
+end;
+v18.Lerp = function(v90, v91, v92)
+    return v90 + (v91 - v90) * v92;
+end;
+v18.Damage = function(v93, v94, v95)
+    if not v95 then
+        v95 = 5;
+    end;
+    local v96 = nil;
+    local l_HumanoidRootPart_2 = v93:WaitForChild("HumanoidRootPart");
+    local l_Humanoid_0 = v93:WaitForChild("Humanoid");
+    for _, v100 in pairs(workspace.Live:GetChildren()) do
+        if (v100:FindFirstChild("HumanoidRootPart") and v100 ~= v93) and ((l_HumanoidRootPart_2.Position + l_HumanoidRootPart_2.CFrame.lookVector * v95) - v100.HumanoidRootPart.Position).magnitude <= v95 then
+            task.spawn(function()
+                game.Lighting.Blur.Size = 16;
+                for _ = 1, 5 do
+                    game.Lighting.Blur.Size = game.Lighting.Blur.Size - 2;
+                    wait(0.03);
+                end;
+            end);
+            game.ReplicatedStorage.Remotes.Damage:InvokeServer(_G.Pass, v100, v94.Name);
+            v96 = v100;
+            break;
+        end;
+    end;
+    if not v96 then
+        game.ReplicatedStorage.Remotes.Damage:InvokeServer(_G.Pass, nil, v94.Name);
+    end;
+    return v96;
+end;
+v18.CombatAnimation = function(v102, v103, v104, v105)
+    local l_Humanoid_0 = v103.Humanoid;
+    local l_HumanoidRootPart_3 = v103.HumanoidRootPart;
+    v102.KeyframeReached:Connect(function(v109)
+        if v109 == "Slash" and v105[v102.Name] then
+            game.ReplicatedStorage.Remotes.SwordHandler:FireServer({
+                _G.Pass, 
+                "SlashEffect", 
+                l_HumanoidRootPart_3.CFrame + l_HumanoidRootPart_3.CFrame.lookVector * 2, 
+                v105[v102.Name].Angle, 
+                v105[v102.Name].Direction, 
+                v105[v102.Name].Speed, 
+                v105[v102.Name].Times, 
+                v105[v102.Name].Size, 
+                v105[v102.Name].Color
+            });
+        end;
+        print("Keyframe:", v109);
+        if v109 == "1" then
+            v103.Head:FindFirstChild("Swing2"):Play();
+            if v18.Damage(v103, v102) then
+                v18.shakeScreen("Bump");
+                return ;
+            end;
+        elseif v109 == "2" then
+            v103.Head:FindFirstChild("Swing2"):Play();
+            if v18.Damage(v103, v102) then
+                v18.shakeScreen("Bump");
+                return ;
+            end;
+        elseif v109 == "3" then
+            v103.Head:FindFirstChild("Swing2"):Play();
+            if v18.Damage(v103, v102) then
+                v18.shakeScreen("SmallExplosion");
+                return ;
+            end;
+        elseif v109 == "4" then
+            v103.Head:FindFirstChild("Swing2"):Play();
+            if v18.Damage(v103, v102) then
+                v18.shakeScreen("Explosion");
+                return ;
+            end;
+        elseif v109 == "5" then
+            v103.Head:FindFirstChild("Swing2"):Play();
+            if v18.Damage(v103, v102) then
+                v18.shakeScreen("Explosion");
+                return ;
+            end;
+        elseif v109 == "6" then
+            v103.Head:FindFirstChild("Swing2"):Play();
+            if v18.Damage(v103, v102) then
+                v18.shakeScreen("Explosion");
+                return ;
+            end;
+        elseif v109 == "7" then
+            v103.Head:FindFirstChild("Swing2"):Play();
+            task.spawn(function()
+                game.ReplicatedStorage.Remotes.Functions:InvokeServer({
+                    _G.Pass, 
+                    "PlaySound", 
+                    game.ReplicatedStorage.Sounds.Knife_Slash, 
+                    v103.Head
+                });
+            end);
+            if v18.Damage(v103, v102) then
+                v18.shakeScreen("Bump");
+                return ;
+            end;
+        elseif v109 == "8" then
+            v103.Head:FindFirstChild("Swing2"):Play();
+            task.spawn(function()
+                game.ReplicatedStorage.Remotes.Functions:InvokeServer({
+                    _G.Pass, 
+                    "PlaySound", 
+                    game.ReplicatedStorage.Sounds.Knife_Slash, 
+                    v103.Head
+                });
+            end);
+            if v18.Damage(v103, v102) then
+                v18.shakeScreen("Explosion");
+                return ;
+            end;
+        elseif v109 == "9" then
+            v103.Head:FindFirstChild("Swing2"):Play();
+            task.spawn(function()
+                game.ReplicatedStorage.Remotes.Functions:InvokeServer({
+                    _G.Pass, 
+                    "PlaySound", 
+                    game.ReplicatedStorage.Sounds.Knife_Slash, 
+                    v103.Head
+                });
+            end);
+            if v18.Damage(v103, v102) then
+                v18.shakeScreen("Explosion");
+                return ;
+            end;
+        elseif v109 == "10" then
+            v103.Head:FindFirstChild("Swing2"):Play();
+            v102:AdjustSpeed(0);
+            if v18.Damage(v103, v102) then
+                v104.Position = v104.Position + Vector3.new(0, 25, 0, 0);
+                v104.P = 10000;
+                v18.shakeScreen("Explosion");
+            end;
+            v102:AdjustSpeed(1);
+            return ;
+        elseif v109 == "11" then
+            v103.Head:FindFirstChild("Swing2"):Play();
+            if v18.Damage(v103, v102) then
+                v18.shakeScreen("Bump");
+                return ;
+            end;
+        elseif v109 == "12" then
+            v103.Head:FindFirstChild("Swing2"):Play();
+            if v18.Damage(v103, v102) then
+                v18.shakeScreen("Explosion");
+                return ;
+            end;
+        elseif v109 == "13" then
+            v103.Head:FindFirstChild("Spear"):Play();
+            if v18.Damage(v103, v102) then
+                v18.shakeScreen("Bump");
+                return ;
+            end;
+        elseif v109 == "14" then
+            v103.Head:FindFirstChild("ChaosSaberSlice"):Play();
+            if v18.Damage(v103, v102) then
+                v18.shakeScreen("Bump");
+                return ;
+            end;
+        elseif v109 == "15" then
+            v103.Head:FindFirstChild("ChaosSaberSlice"):Play();
+            v102:AdjustSpeed(0.2);
+            local v110 = v18.Damage(v103, v102);
+            v102:AdjustSpeed(1);
+            if v110 then
+                v18.shakeScreen("Explosion");
+                return ;
+            end;
+        elseif v109 == "16" then
+            task.spawn(function()
+                game.ReplicatedStorage.Remotes.Functions:InvokeServer({
+                    _G.Pass, 
+                    "PlaySound", 
+                    game.ReplicatedStorage.Sounds.KnifeSwing2, 
+                    v103.Head
+                });
+            end);
+            if v18.Damage(v103, v102) then
+                v18.shakeScreen("Bump");
+                return ;
+            end;
+        elseif v109 == "17" then
+            task.spawn(function()
+                game.ReplicatedStorage.Remotes.Functions:InvokeServer({
+                    _G.Pass, 
+                    "PlaySound", 
+                    game.ReplicatedStorage.Sounds.KnifeSwing2, 
+                    v103.Head
+                });
+            end);
+            if v18.Damage(v103, v102) then
+                v18.shakeScreen("Explosion");
+                return ;
+            end;
+        elseif v109 == "18" then
+            v102:AdjustSpeed(0.4);
+            v103.Head:FindFirstChild("Swing2"):Play();
+            if v18.Damage(v103, v102) then
+                v18.shakeScreen("Explosion");
+            end;
+            v102:AdjustSpeed(0.9);
+            return ;
+        elseif v109 == "19" then
+            v103.Head:FindFirstChild("Swing2"):Play();
+            task.spawn(function()
+                game.ReplicatedStorage.Remotes.Functions:InvokeServer({
+                    _G.Pass, 
+                    "PlaySound", 
+                    game.ReplicatedStorage.Sounds.KnifeSwing2, 
+                    v103.Head
+                });
+            end);
+            if v18.Damage(v103, v102) then
+                v18.shakeScreen("SmallExplosion");
+                return ;
+            end;
+        elseif v109 == "20" then
+            task.spawn(function()
+                game.ReplicatedStorage.Remotes.Functions:InvokeServer({
+                    _G.Pass, 
+                    "PlaySound", 
+                    game.ReplicatedStorage.Sounds.KnifeSwing2, 
+                    v103.Head
+                });
+            end);
+            if v18.Damage(v103, v102) then
+                v18.shakeScreen("BigExplosion");
+                return ;
+            end;
+        elseif v109 == "21" then
+            task.spawn(function()
+                game.ReplicatedStorage.Remotes.Functions:InvokeServer({
+                    _G.Pass, 
+                    "PlaySound", 
+                    game.ReplicatedStorage.Sounds.KnifeSwing2, 
+                    v103.Head
+                });
+            end);
+            if v18.Damage(v103, v102) then
+                v18.shakeScreen("Bump");
+                return ;
+            end;
+        elseif v109 == "BettyGrab" then
+            v102:AdjustSpeed(0.1);
+            _G.RootPartFollow = false;
+            game.ReplicatedStorage.Remotes.BettyMoves:InvokeServer({
+                _G.Pass, 
+                "CombatGrab"
+            });
+            v102:AdjustSpeed(0.5);
+            _G.RootPartFollow = true;
+        end;
+    end);
+end;
+v18.BurstScreen = function(v111, v112, v113, v114, v115)
+    task.spawn(function()
+        local v116 = v111.Character.Resources.Guis.BurstScreen:Clone();
+        v116[v112].BackgroundTransparency = 0;
+        if v113 then
+            v116[v112].BackgroundColor3 = v113;
+        end;
+        v116.Parent = v111.PlayerGui;
+        if v115 then
+            wait(v115);
+        end;
+        if not v114 then
+            v114 = 10;
+        end;
+        for _ = 1, v114 do
+            v116[v112].BackgroundTransparency = v116[v112].BackgroundTransparency + 1 / v114;
+            wait();
+        end;
+        v116:Destroy();
+    end);
+end;
+v18.AddKeyframes = function(v118, v119)
+    local l_Parent_0 = v119.Parent;
+    local l_HumanoidRootPart_0 = l_Parent_0:WaitForChild("HumanoidRootPart");
+    local l_Humanoid_2 = l_Parent_0:WaitForChild("Humanoid");
+    v118.KeyframeReached:Connect(function(v123)
+        if v123 == "Pause" then
+            v118:AdjustSpeed(0);
+            return ;
+        else
+            if v123 == "Step" then
+                if l_Humanoid_2.FloorMaterial == Enum.Material.Grass then
+                    l_Parent_0.Head.walking_step_grass:Play();
+                    return ;
+                elseif not (l_Humanoid_2.FloorMaterial ~= Enum.Material.Sand and l_Humanoid_2.FloorMaterial ~= Enum.Material.Snow) or l_Humanoid_2.FloorMaterial == Enum.Material.Mud then
+                    l_Parent_0.Head.walking_step_sand:Play();
+                    return ;
+                elseif not (l_Humanoid_2.FloorMaterial ~= Enum.Material.Wood) or l_Humanoid_2.FloorMaterial == Enum.Material.WoodPlanks then
+                    l_Parent_0.Head.walking_step_wood:Play();
+                    return ;
+                elseif not (((((l_Humanoid_2.FloorMaterial ~= Enum.Material.Concrete and l_Humanoid_2.FloorMaterial ~= Enum.Material.Ground) and l_Humanoid_2.FloorMaterial ~= Enum.Material.Asphalt) and l_Humanoid_2.FloorMaterial ~= Enum.Material.Cobblestone) and l_Humanoid_2.FloorMaterial ~= Enum.Material.SmoothPlastic) and l_Humanoid_2.FloorMaterial ~= Enum.Material.Plastic) or l_Humanoid_2.FloorMaterial == Enum.Material.Slate then
+                    l_Parent_0.Head.walking_step_stone:Play();
+                    return ;
+                end;
+            elseif v123 == "RepeatEnd" then
+                v118.TimePosition = v118:GetTimeOfKeyframe("RepeatStart");
+            end;
+            return ;
+        end;
+    end);
+end;
+v18.BlurEffect = function(v124, v125)
+    task.spawn(function()
+        local v126 = game.Lighting:FindFirstChild("Blur") or Instance.new("BlurEffect", game.Lighting);
+        v126.Size = v124;
+        for _ = 1, v125 do
+            v126.Size = v126.Size - v124 / v125;
+            wait(0.03);
+        end;
+    end);
+end;
+v18.CreateTween = function(v128, v129, v130, v131)
+    local v132 = game:GetService("TweenService"):Create(v128, TweenInfo.new(unpack(v129)), v130);
+    if v131 then
+        v132:Play();
+    end;
+    return v132;
+end;
+v18.GetPlayerParts = function(v133)
+    if not v11[v133] then
+        v11[v133] = {};
+    end;
+    if not v11[v133][1] then
+        for _, v135 in pairs(v133:GetDescendants()) do
+            if v135:IsA("BasePart") then
+                table.insert(v11[v133], v135);
+            end;
+        end;
+    end;
+    return v11[v133];
+end;
+v18.DisableEffects = function(v136, v137)
+    for _, v139 in pairs(v136:GetChildren()) do
+        if v139.Name == v137 then
+            v139.Enabled = false;
+        end;
+    end;
+end;
+v18.CheckTable = function(v140, v141)
+    for _, v143 in pairs(v140) do
+        if v143 == v141 then
+            return true;
+        end;
+    end;
+    return false;
+end;
+v18.getNearByHumanoids = function(v144)
+    local v145 = l_LocalPlayer_0.Character or l_LocalPlayer_0.CharacterAdded:Wait();
+    local l_HumanoidRootPart_5 = v145.HumanoidRootPart;
+    local v147 = nil;
+    for _, v149 in pairs(workspace.Live:GetChildren()) do
+        local v150 = v149:FindFirstChild("HumanoidRootPart") or v149:FindFirstChild("Torso");
+        if (v150 and v149 ~= v145) and ((l_HumanoidRootPart_5.Position + l_HumanoidRootPart_5.CFrame.lookVector * v144) - v150.Position).magnitude <= v144 then
+            v147 = v149;
+        end;
+    end;
+    return v147;
+end;
+v18.combatDamage = function(...)
+    local v151 = l_LocalPlayer_0.Character or l_LocalPlayer_0.CharacterAdded:Wait();
+    local l_HumanoidRootPart_6 = v151.HumanoidRootPart;
+    local v153 = nil;
+    for _, v155 in pairs(workspace.Live:GetChildren()) do
+        if (v155:FindFirstChild("HumanoidRootPart") and v155 ~= v151) and ((l_HumanoidRootPart_6.Position + l_HumanoidRootPart_6.CFrame.lookVector * 5) - v155.HumanoidRootPart.Position).magnitude <= 6 then
+            v153 = v155;
+            if not l_Remotes_0.Damage:InvokeServer(v153, ...) then
+                return nil;
+            end;
+        end;
+    end;
+    return v153;
+end;
+v18.RotatePart = function(v156)
+    local v157 = {};
+    v157.Play = function(_, v159, v160, v161)
+        task.spawn(function()
+            v157:Stop();
+            v156:SetAttribute("PlayingRotation", true);
+            local v162, v163, v164 = unpack(v159);
+            local l_v162_0 = v162;
+            local l_v163_0 = v163;
+            local l_v164_0 = v164;
+            if v160 then
+                task.spawn(function()
+                    local v168 = v160 / 0.03;
+                    local v169 = 0;
+                    local v170 = 0;
+                    local v171 = 0;
+                    v162 = v169;
+                    v163 = v170;
+                    v164 = v171;
+                    for _ = 1, v168 do
+                        v162 = v162 + l_v162_0 / v168;
+                        v163 = v163 + l_v163_0 / v168;
+                        v164 = v164 + l_v164_0 / v168;
+                        wait(0.03);
+                    end;
+                end);
+            end;
+            local v173 = true;
+            while v173 and v156:GetAttribute("PlayingRotation") do
+                v173 = pcall(function()
+                    if v156.Parent:FindFirstChild(v156.Name) then
+                        v156.CFrame = v156.CFrame * CFrame.Angles(v162, v163, v164);
+                    end;
+                end);
+                wait(0.03);
+            end;
+            if v161 and v173 then
+                local v174 = true;
+                do
+                    local l_v174_0 = v174;
+                    task.spawn(function()
+                        local v176 = v161 / 0.03;
+                        local l_l_v162_0_0 = l_v162_0;
+                        local l_l_v163_0_0 = l_v163_0;
+                        local l_l_v164_0_0 = l_v164_0;
+                        v162 = l_l_v162_0_0;
+                        v163 = l_l_v163_0_0;
+                        v164 = l_l_v164_0_0;
+                        for _ = 1, v176 do
+                            v162 = v162 - l_v162_0 / v176;
+                            v163 = v163 - l_v163_0 / v176;
+                            v164 = v164 - l_v164_0 / v176;
+                            v173 = pcall(function()
+                                if v156.Parent:FindFirstChild(v156.Name) then
+                                    v156.CFrame = v156.CFrame * CFrame.Angles(v162, v163, v164);
+                                end;
+                            end);
+                            if v173 then
+                                wait(0.03);
+                            else
+                                break;
+                            end;
+                        end;
+                        l_v174_0 = false;
+                    end);
+                end;
+            end;
+        end);
+    end;
+    v157.Stop = function(_)
+        v156:SetAttribute("PlayingRotation", false);
+    end;
+    return v157;
+end;
+local v182 = {
+    BodyPosition = "AlignPosition", 
+    BodyVelocity = "LinearVelocity", 
+    BodyGyro = "AlignOrientation"
+};
+v18.CreateBodyMover = function(...)
+    local v183, v184, v185, v186, v187 = unpack(...);
+    for _, v189 in pairs(v184:GetChildren()) do
+        if v189:IsA(v183) then
+            v189:Destroy();
+        end;
+    end;
+    v183 = v182[v183];
+    local v190 = Instance.new(v183);
+    v190.Name = "Client";
+    if v183 == "AlignPosition" then
+        v190.ForceLimitMode = Enum.ForceLimitMode.PerAxis;
+        v190.Responsiveness = 50;
+        v190.Mode = Enum.PositionAlignmentMode.OneAttachment;
+        v190.Attachment0 = v184.RootAttachment;
+        v190.Position = v186;
+        v190.Parent = v184;
+    elseif v183 == "AlignOrientation" then
+        v190.MaxTorque = v185;
+        v190.Responsiveness = 50;
+        v190.Mode = Enum.PositionAlignmentMode.OneAttachment;
+        v190.Attachment0 = v184.RootAttachment;
+        v190.MaxTorque = v185 and v185 * 10000 or Vector3.one * 10000;
+        v190.CFrame = v186;
+        v190.Parent = v184;
+    elseif v183 == "LinearVelocity" then
+        v190.ForceLimitMode = Enum.ForceLimitMode.PerAxis;
+        v190.MaxAxesForce = v185 and v185 * 10000 or Vector3.one * 10000;
+        v190.VelocityConstraintMode = Enum.VelocityConstraintMode.Vector;
+        v190.Attachment0 = v184.RootAttachment;
+        v190.VectorVelocity = v186;
+        v190.Parent = v184;
+    end;
+    v184.RootAttachment.WorldPosition = v184.AssemblyCenterOfMass;
+    if v187 then
+        game.Debris:AddItem(v190, v187);
+    end;
+    return v190;
+end;
+return v18;
