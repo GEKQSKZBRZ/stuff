@@ -34,24 +34,4 @@ function util:randSpawn()
 	end
 end
 
-function util:createAnim(id, name, par)
-	local animins = Instance.new("Animation")
-	animins.AnimationId = "rbxassetid://"..id
-	animins.Name = name
-	animins.Parent = par
-	return animins
-end
-
-function util:downloadAsset(name, link)
-	if isfile(name) then
-		pcall(delfile, name)
-		repeat task.wait() until not isfile(name)
-	end
-	
-	pcall(writefile, name, request({Url = link, Method = 'GET'}).Body)
-	repeat task.wait() until isfile(name)
-	return custAsset(name)
-end
-
-
 return util
